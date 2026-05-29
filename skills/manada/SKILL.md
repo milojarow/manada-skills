@@ -68,4 +68,4 @@ You are <role>. <system prompt — self-contained so the agent is portable>.
 - **Dispatching with a thin prompt.** The subagent starts blind — no view of this conversation. If you don't put the file path, the error, the expected shape in the dispatch prompt, it works in the dark.
 - **`~/.claude/agents/` for something meant to be scoped.** That's user-global — visible in every session. For "only this project" use `.claude/agents/`; for "ships with the skill" use the plugin's `agents/`.
 - **Filesystem agent edited mid-session and expected to load.** Agents load at startup; restart (or reinstall the plugin) to pick up a new/edited agent.
-- **Vague `description`.** Auto-dispatch matches the description. "reviews things" leaks; "validate kie.ai images for a short, only for X" stays in its lane.
+- **Vague `description`.** Auto-dispatch matches the description. "reviews things" leaks; "validate the generated images for a short, only for that project" stays in its lane.
