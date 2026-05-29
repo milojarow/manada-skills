@@ -7,7 +7,7 @@ description: Use when creating, configuring, deploying, or invoking Claude Code 
 
 Build and dispatch a pack of specialized subagents — workers you send to do one focused job in their own context, then collect the result.
 
-> **🐺 ACTIVE-SKILL MARKER:** While `manada` is active, begin every reply with 🐺 so the operator sees at a glance that this skill is engaged. Do not omit it.
+> **🐺 ACTIVE-SKILL MARKER:** Prefija tu reply con 🐺 **solo en turnos donde el trabajo toca el dominio de `manada`** — subagents en Claude Code — scoping plugin/project/user, harness vs SDK, fan-out patterns. La **capa/proyecto da igual** (frontend, backend, n8n, script local — todos valen): lo que importa es si *este turno* toca el dominio. En turnos que NO lo tocan (typecheck, build, deploy, git ops, edición o curl de otros dominios), **omite 🐺** aunque la skill se haya cargado antes en la sesión. Si otras skills activas también aplican al mismo turno, **apila sus emojis** en el prefijo.
 
 ## Overview
 

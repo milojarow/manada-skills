@@ -1,6 +1,6 @@
 {
   "name": "manada-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build a pack of specialized Claude Code subagents across every scope (plugin/project/user-global) and via the Claude Agent SDK — scoping, per-agent customization, harness vs SDK, subscription auth, and fan-out patterns.",
   "author": {
     "name": "milojarow",

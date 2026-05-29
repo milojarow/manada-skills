@@ -10,7 +10,7 @@
       "name": "manada-skills",
       "source": "./",
       "description": "Build a pack of specialized Claude Code subagents. Covers the three scopes (plugin/project/user-global) and the headless Claude Agent SDK; per-agent customization (model, tools, preloaded skills, persistent memory, effort, color); the security limits on plugin-shipped agents and how to lift them; harness vs SDK; subscription auth; and when parallel fan-out pays off vs adds overhead.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "milojarow",
         "url": "https://github.com/milojarow"
