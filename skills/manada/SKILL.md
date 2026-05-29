@@ -34,7 +34,7 @@ Two runtimes, same agent definition:
 
 | Topic | Reference |
 |---|---|
-| The 3 scopes (plugin/project/user) + the two locks (location + description); the plugin-agent security cap on `hooks`/`mcpServers`/`permissionMode` and **how to lift it** | [reference/scopes.md](reference/scopes.md) |
+| The 3 scopes (plugin/project/user) + the two locks (location + description); the plugin-agent security cap on `hooks`/`mcpServers`/`permissionMode` and **how to lift it**; why the `~/.claude/projects/<slug>/` dir is NOT where agent definitions live (config vs data) | [reference/scopes.md](reference/scopes.md) |
 | Per-agent customization — frontmatter fields (`model`, `tools`/`disallowedTools`, `skills`, `memory`, `effort`, `color`); what a subagent inherits (fresh context) | [reference/personalization.md](reference/personalization.md) |
 | Harness (Agent tool) vs headless SDK (`query()`); subscription auth; sessions (resume/continue/fork); the Node-version launch gotcha | [reference/harness-vs-sdk.md](reference/harness-vs-sdk.md) |
 | Dispatching — fan-out vs pipeline vs overhead; how to send N agents in parallel and collect them | [reference/dispatching.md](reference/dispatching.md) |
