@@ -1,0 +1,13 @@
+{
+  "name": "manada-skills",
+  "version": "0.1.0",
+  "description": "Build a pack of specialized Claude Code subagents across every scope (plugin/project/user-global) and via the Claude Agent SDK — scoping, per-agent customization, harness vs SDK, subscription auth, and fan-out patterns.",
+  "author": {
+    "name": "milojarow",
+    "url": "https://github.com/milojarow"
+  },
+  "license": "MIT",
+  "keywords": ["subagents", "agent-sdk", "claude-agent-sdk", "fan-out", "plugin-agents", "orchestration", "agent-memory", "meeseeks"],
+  "repository": "https://github.com/milojarow/manada-skills",
+  "homepage": "https://github.com/milojarow/manada-skills"
+}

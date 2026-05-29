@@ -1,0 +1,7 @@
+# Claude Code operator state (never share) — note: the repo's own CLAUDE.md IS committed (skill-repo convention)
+.claude/
+
+# OS / editor cruft
+.DS_Store
+*.swp
+node_modules/

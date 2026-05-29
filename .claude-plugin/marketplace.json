@@ -1,0 +1,25 @@
+{
+  "name": "manada-skills",
+  "description": "Create, customize, deploy and invoke Claude Code subagents across every scope (plugin, project, user-global) and via the Claude Agent SDK.",
+  "owner": {
+    "name": "milojarow",
+    "url": "https://github.com/milojarow"
+  },
+  "plugins": [
+    {
+      "name": "manada-skills",
+      "source": "./",
+      "description": "Build a pack of specialized Claude Code subagents. Covers the three scopes (plugin/project/user-global) and the headless Claude Agent SDK; per-agent customization (model, tools, preloaded skills, persistent memory, effort, color); the security limits on plugin-shipped agents and how to lift them; harness vs SDK; subscription auth; and when parallel fan-out pays off vs adds overhead.",
+      "version": "0.1.0",
+      "author": {
+        "name": "milojarow",
+        "url": "https://github.com/milojarow"
+      },
+      "category": "ai-agents",
+      "keywords": ["subagents", "agent-sdk", "claude-agent-sdk", "fan-out", "plugin-agents", "orchestration", "agent-memory", "meeseeks"],
+      "homepage": "https://github.com/milojarow/manada-skills",
+      "repository": "https://github.com/milojarow/manada-skills",
+      "license": "MIT"
+    }
+  ]
+}
