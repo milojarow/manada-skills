@@ -39,6 +39,7 @@ Two runtimes, same agent definition:
 | Harness (Agent tool) vs headless SDK (`query()`); subscription auth; sessions (resume/continue/fork); the Node-version launch gotcha | [reference/harness-vs-sdk.md](reference/harness-vs-sdk.md) |
 | Dispatching — fan-out vs pipeline vs overhead; how to send N agents in parallel and collect them | [reference/dispatching.md](reference/dispatching.md) |
 | Creating, deploying & integrating an agent into each scope; portability (the agent travels with the plugin) | [reference/creating-deploying.md](reference/creating-deploying.md) |
+| Running a pack headless from a launcher script — the four anti-fork-bomb locks; splitting IO (bash) from judgment (LLM) with a digest; calibrating the input cap; gate→lock→fire-and-forget dispatch; per-lobo model/effort | [reference/headless-launcher.md](reference/headless-launcher.md) |
 
 ## Quick reference
 
