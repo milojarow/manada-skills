@@ -1,0 +1,20 @@
+{
+  "id": "manada-003",
+  "skills": ["manada"],
+  "query": "Can a subagent remember things across sessions? How do I give it persistent memory?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/personalization.md",
+    "Answers yes — set the memory frontmatter field to user | project | local",
+    "Explains memory: user persists to ~/.claude/agent-memory/<name>/",
+    "Notes that omitting the memory field leaves the agent ephemeral (fresh context every run)"
+  ],
+  "expected_content": [
+    "memory",
+    "user",
+    "agent-memory",
+    "personalization.md"
+  ],
+  "priority": "medium",
+  "notes": "Guards against assuming subagents are always stateless. Cross-session memory is an opt-in frontmatter field with three scopes; omitting it is what makes the agent ephemeral."
+}

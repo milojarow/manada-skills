@@ -1,0 +1,19 @@
+{
+  "id": "manada-004",
+  "skills": ["manada"],
+  "query": "I have 8 independent items to validate. Should I use one agent or fan out to many?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/dispatching.md",
+    "Recommends fan-out — N agents in parallel — because the work is independent (gains parallelism + context isolation + specialization)",
+    "Notes that fan-out is pure overhead for sequential / dependent work, which the main session should do directly"
+  ],
+  "expected_content": [
+    "fan-out",
+    "parallel",
+    "independent",
+    "dispatching.md"
+  ],
+  "priority": "medium",
+  "notes": "Guards against both the 'Meeseek of decoration' (spawning agents for sequential work) and the inverse (running 8 independent jobs serially). Independence is the deciding factor, not item count alone."
+}

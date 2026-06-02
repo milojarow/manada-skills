@@ -1,0 +1,20 @@
+{
+  "id": "manada-002",
+  "skills": ["manada"],
+  "query": "My agent ships in a plugin but its mcpServers and permissionMode are being ignored. Why, and how do I get them to apply?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/scopes.md",
+    "Explains that plugin-shipped agents drop hooks / mcpServers / permissionMode for security because of third-party provenance, NOT because of a capability ceiling",
+    "States the same agent regains those fields when moved to project scope (.claude/agents/), user scope (~/.claude/agents/), or run via the SDK"
+  ],
+  "expected_content": [
+    "mcpServers",
+    "permissionMode",
+    "hooks",
+    "security",
+    "scopes.md"
+  ],
+  "priority": "high",
+  "notes": "Guards against the naive read that plugin agents simply 'can't have' those fields. The cap is a provenance security gate; the fix is changing scope (project/user/SDK), not abandoning the capability."
+}

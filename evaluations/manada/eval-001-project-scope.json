@@ -1,0 +1,19 @@
+{
+  "id": "manada-001",
+  "skills": ["manada"],
+  "query": "I want an agent available only when I work in a specific project. Where does the file go, and what makes it project-only?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/scopes.md",
+    "Places the agent at <project>/.claude/agents/<name>.md",
+    "Explains it is discovered by walking up from the cwd, so it is not visible in other projects",
+    "Contrasts project scope with ~/.claude/agents/ (user-global, visible everywhere) and the plugin's agents/ dir"
+  ],
+  "expected_content": [
+    ".claude/agents/",
+    "project",
+    "scopes.md"
+  ],
+  "priority": "high",
+  "notes": "Guards against putting a project-only agent in ~/.claude/agents/ (user-global), which makes it fire in every session. The 'location lock' is what makes an agent project-scoped, not the description."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "manada-005",
+  "skills": ["manada"],
+  "query": "I want to run an agent on a timer using my Claude Max plan, without paying for an API key. How?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/harness-vs-sdk.md",
+    "Uses the SDK headless path with claude setup-token to obtain CLAUDE_CODE_OAUTH_TOKEN",
+    "Warns to unset ANTHROPIC_API_KEY because if it is present it wins and bills the API instead of the subscription"
+  ],
+  "expected_content": [
+    "setup-token",
+    "CLAUDE_CODE_OAUTH_TOKEN",
+    "ANTHROPIC_API_KEY",
+    "harness-vs-sdk.md"
+  ],
+  "priority": "high",
+  "notes": "Guards against silently billing the metered API. A lingering ANTHROPIC_API_KEY env var overrides the OAuth subscription token, so the user pays per-token despite intending to use their Max plan."
+}
