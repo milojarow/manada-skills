@@ -25,6 +25,12 @@
 Add this marketplace in Claude Code:
 
 ```
+/plugin marketplace add milojarow/manada-skills
+```
+
+Or via the Marketplaces UI:
+
+```
 /plugin → Marketplaces → Add Marketplace → milojarow/manada-skills
 ```
 
