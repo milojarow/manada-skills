@@ -1,6 +1,6 @@
 ---
 name: manada
-description: Use when creating, configuring, deploying, or invoking Claude Code subagents — agents shipped inside a plugin/skill, project agents in `.claude/agents/`, user-global agents in `~/.claude/agents/`, or agents built programmatically with the Claude Agent SDK (`query()` / `AgentDefinition`). Use when picking a subagent's scope so it stays available only where intended; customizing its model, tools, preloaded skills, persistent memory, effort, or color; giving a subagent cross-session memory; wiring subagents into a skill's workflow; choosing the interactive harness (Agent tool) vs the headless SDK; running agents on a Claude Pro/Max subscription without an API key; or deciding when parallel subagents (fan-out) pay off vs add overhead. Also covers the security cap on plugin-shipped agents (hooks/mcpServers/permissionMode ignored) and how to lift it. Not for authoring the skill that agents live in — that is `forjador-de-skills` / `superpowers:writing-skills`.
+description: Use when creating, configuring, deploying, or invoking Claude Code subagents — agents shipped inside a plugin/skill, project agents in `.claude/agents/`, user-global agents in `~/.claude/agents/`, or agents built programmatically with the Claude Agent SDK (`query()` / `AgentDefinition`). Use when picking a subagent's scope so it stays available only where intended; customizing its model, tools, preloaded skills, persistent memory, effort, or color; giving a subagent cross-session memory; wiring subagents into a skill's workflow; choosing the interactive harness (Agent tool) vs the headless SDK; running agents on a Claude Pro/Max subscription without an API key; or deciding when parallel subagents (fan-out) pay off vs add overhead. Also covers the security cap on plugin-shipped agents (hooks/mcpServers/permissionMode ignored) and how to lift it, and how to actually confine a headless agent (a `PreToolUse` guard, since `allowedTools` without Edit/Write is not read-only while `Bash` is allowed). Not for authoring the skill that agents live in — that is `forjador-de-skills` / `superpowers:writing-skills`.
 ---
 
 # Manada — Claude Code subagents
@@ -40,6 +40,7 @@ Two runtimes, same agent definition:
 | Dispatching — fan-out vs pipeline vs overhead; how to send N agents in parallel and collect them | [reference/dispatching.md](reference/dispatching.md) |
 | Creating, deploying & integrating an agent into each scope; portability (the agent travels with the plugin) | [reference/creating-deploying.md](reference/creating-deploying.md) |
 | Running a pack headless from a launcher script — the four anti-fork-bomb locks; splitting IO (bash) from judgment (LLM) with a digest; calibrating the input cap; gate→lock→fire-and-forget dispatch; per-lobo model/effort | [reference/headless-launcher.md](reference/headless-launcher.md) |
+| Confining a headless lobo — why `allowedTools` without `Edit`/`Write` is **not** read-only (`Bash` subsumes them); enforcing with a `PreToolUse` hook instead of `canUseTool` under `bypassPermissions`; allowlist design; canary verification; failing closed | [reference/headless-confinement.md](reference/headless-confinement.md) |
 
 ## Quick reference
 
@@ -69,4 +70,5 @@ You are <role>. <system prompt — self-contained so the agent is portable>.
 - **Dispatching with a thin prompt.** The subagent starts blind — no view of this conversation. If you don't put the file path, the error, the expected shape in the dispatch prompt, it works in the dark.
 - **`~/.claude/agents/` for something meant to be scoped.** That's user-global — visible in every session. For "only this project" use `.claude/agents/`; for "ships with the skill" use the plugin's `agents/`.
 - **Filesystem agent edited mid-session and expected to load.** Agents load at startup; restart (or reinstall the plugin) to pick up a new/edited agent.
+- **Calling a lobo "read-only" because it has no `Edit`/`Write`.** `Bash` subsumes both (`sed -i`, `>`, `tee`) plus service stops, deletions and `rm -rf`. Real confinement is a `PreToolUse` hook with a deny-by-default allowlist — see [reference/headless-confinement.md](reference/headless-confinement.md).
 - **Vague `description`.** Auto-dispatch matches the description. "reviews things" leaks; "validate the generated images for a short, only for that project" stays in its lane.

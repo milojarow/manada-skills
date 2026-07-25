@@ -48,4 +48,9 @@ Not every lobo needs the same horsepower. Drive `model` and `effort` per lobo fr
 
 This keeps the expensive tier on the few calls that can't be undone, and the cheap tier on the bulk.
 
+The four locks keep the pack from multiplying; they do **not** bound what a single lobo can do to
+the machine. For that, see [headless-confinement.md](headless-confinement.md) — note especially that
+`settingSources: []` (lock 1) also means filesystem hooks don't load, so the guard hook has to be
+passed programmatically.
+
 See [harness-vs-sdk.md](harness-vs-sdk.md) for the SDK-side gotchas (Node launch, stdin, the result envelope, subscription auth) and [scopes.md](scopes.md) for why a headless run uses inline `agents`.
