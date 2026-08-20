@@ -39,6 +39,19 @@ For a launcher hooked into session close or compaction, don't block the host whi
 - **Lock** — a single-instance lock so overlapping triggers don't stack N copies.
 - **Fire-and-forget** — run the work in a detached subshell, `( … ) & disown`. It doesn't hang the close/compaction, and `disown` detaches it from the parent so the background job **survives the client exiting**.
 
+## One run per job: systemd template units, and why `%I` is the trap
+
+When each dispatch is its own unit instance (`lobo@<job-id>.service`), the two specifiers that pass the instance name into `ExecStart` are **not** interchangeable — and the one that looks more robust is the dangerous one:
+
+- **`%i`** — the raw instance name. Spaces arrive as `\x20`.
+- **`%I`** — the *unescaped* name. `\x20` becomes a space again, but **every `-` becomes `/`**, because in systemd's escaping a hyphen encodes a path separator.
+
+Measured: a unit with `ExecStart=… run.mjs "%I"` and instance `2026-08-20_1344_informe-mensual-1` received the path `2026/08/20_1344_informe/mensual/1`. Switching `%i` → `%I` "for robustness" turned a spaces bug into an invented-paths bug — and the launcher then writes its output into directories nobody asked for.
+
+**Rule: if the job id is slugified (`[a-z0-9._-]`, no spaces), use `%i`.** The raw string already *is* the value. `%I` only helps when the id can contain spaces **and** contains no hyphens, which in practice is almost never.
+
+Cheaper than fighting the escaping: **guarantee the id is safe at the source** — slugify when the job is created. One space in an id breaks three layers at once: systemd, the filesystem paths the launcher derives, and any `^[A-Za-z0-9._-]+$` id validator on the API or UI that later reads the run.
+
 ## Tune model and effort per lobo, by env var
 
 Not every lobo needs the same horsepower. Drive `model` and `effort` per lobo from an env var so the launcher sets them per role:
