@@ -123,6 +123,18 @@ Five requirements — R1–R3 measured against real machines, R4–R5 structural
 - **R5 — the gate runs outside the model's reach**: in the launcher, after the model's work is
   committed and before anything leaves the machine.
 
+## `git show` on the outgoing diff produces a false positive, per commit
+
+Auditing an outgoing push by piping `git show <sha>` (or a range) into the deny-list grep also
+feeds the grep `git show`'s own header — `Author: Name <email>` — and an email-shaped pattern in
+the deny-list matches it every time. That is public commit metadata, not the content of the
+change, and it makes the gate look like it is blocking a real leak on every single commit.
+
+Use `git diff <sha>^..<sha>` (or `git diff @{u}..HEAD` for a range) instead — it carries only the
+changed lines, no author/commit headers. Measured against two real pushes: `git show` produced
+one phantom hit, `git diff` produced zero. If a gate is built on `git show`, it is not broken —
+it is measuring the wrong thing.
+
 ## Fail closed
 
 If the guard module is missing, the `import` throws and the lobo **does not run** — failing closed,

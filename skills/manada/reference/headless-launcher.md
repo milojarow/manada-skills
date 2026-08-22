@@ -145,6 +145,20 @@ Not every lobo needs the same horsepower. Drive `model` and `effort` per lobo fr
 
 This keeps the expensive tier on the few calls that can't be undone, and the cheap tier on the bulk.
 
+### A bare model alias is a hidden `:latest`
+
+`model: "sonnet"` / `model: "opus"` in code or a launcher's default (`|| "sonnet"`) is not a
+pinned choice — the alias is a moving pointer the provider can repoint without anyone touching a
+line of config. Measured in production: a fleet jumped from one model generation to the next
+overnight with zero commits, because the alias moved under it. Two costs: it can't be audited
+(no config anyone reviewed names the version actually running), and it breaks any cost/latency
+series measured across machines or over time — the pointer can move mid-series on one host and
+not another, and the two halves of the series stop being comparable.
+
+**Rule: code and agent config always name the exact ID** (`claude-sonnet-5`, never `sonnet`) —
+same doctrine as never using a container's `:latest` tag. This applies to what ships; an
+operator typing an alias at an interactive prompt is a conscious, one-off choice and is fine.
+
 The four locks keep the pack from multiplying; they do **not** bound what a single lobo can do to
 the machine. For that, see [headless-confinement.md](headless-confinement.md) — note especially that
 `settingSources: []` (lock 1) also means filesystem hooks don't load, so the guard hook has to be
