@@ -41,6 +41,7 @@ Two runtimes, same agent definition:
 | Creating, deploying & integrating an agent into each scope; portability (the agent travels with the plugin) | [reference/creating-deploying.md](reference/creating-deploying.md) |
 | Running a pack headless from a launcher script — the four anti-fork-bomb locks; splitting IO (bash) from judgment (LLM) with a digest; calibrating the input cap; gate→lock→fire-and-forget dispatch; per-lobo model/effort | [reference/headless-launcher.md](reference/headless-launcher.md) |
 | Confining a headless lobo — why `allowedTools` without `Edit`/`Write` is **not** read-only (`Bash` subsumes them); enforcing with a `PreToolUse` hook instead of `canUseTool` under `bypassPermissions`; allowlist design; canary verification; failing closed | [reference/headless-confinement.md](reference/headless-confinement.md) |
+| Rewriting a tool's input from a `PreToolUse` hook (`updatedInput`) instead of allowing/denying it — bounding an unbounded `Read`, the four rules that keep a rewrite safe, the runtime's own output caps (and why exceeding one does not lose output), and why a hook is not live in the session that registered it | [reference/pretooluse-input-rewriting.md](reference/pretooluse-input-rewriting.md) |
 | What a run costs — `total_cost_usd`/`num_turns` on the result message (and why launchers drop them); telling SDK agents from interactive sessions via `entrypoint`; deduplicating `usage` by `message.id` before summing; cache-bucket multipliers | [reference/cost-accounting.md](reference/cost-accounting.md) |
 
 ## Quick reference
