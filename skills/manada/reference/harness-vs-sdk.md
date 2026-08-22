@@ -42,6 +42,8 @@ for await (const c of process.stdin) s += c;
 
 Each `query()` run ends in a result message whose `subtype` is one of: `success`, `error_exception`, `error_max_turns`, `error_max_budget`. Branch on it — `error_max_turns`/`error_max_budget` are caps you set (raise them or accept the partial), while **`error_exception: "socket connection closed unexpectedly"` is a transient network failure, not a bug** — retry it and it generally passes. Don't treat every non-`success` as a defect to debug.
 
+That same message also carries **`total_cost_usd`** and **`num_turns`** — log them, or the run's cost is gone. See [cost-accounting.md](cost-accounting.md).
+
 ## What the SDK loads by default (isolation)
 
 - **`settingSources`** — omitting it loads user + project + local filesystem settings, **including `CLAUDE.md`** (matches the CLI). To run isolated (no `CLAUDE.md`, no settings) pass `settingSources: []`. Load only what you want, e.g. `["project"]`. (A brief v0.1.0 default of "load nothing" was reverted — use a recent version.)
