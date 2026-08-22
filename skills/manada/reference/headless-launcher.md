@@ -52,6 +52,71 @@ Measured: a unit with `ExecStart=… run.mjs "%I"` and instance `2026-08-20_1344
 
 Cheaper than fighting the escaping: **guarantee the id is safe at the source** — slugify when the job is created. One space in an id breaks three layers at once: systemd, the filesystem paths the launcher derives, and any `^[A-Za-z0-9._-]+$` id validator on the API or UI that later reads the run.
 
+## The launcher must not name a default that belongs to the worker
+
+Found in a coordinated two-machine deploy (caught by the *receiving* agent
+verifying against the EFFECTIVE model in use, not the literal in the code —
+that verification discipline is half the lesson).
+
+A bash launcher for headless lobos logged:
+
+```
+log "LAUNCH gardener ... model=${GARDENER_MODEL:-opus}"
+```
+
+while the worker `.mjs` resolved:
+
+```js
+const model = process.env.GARDENER_MODEL || "sonnet";
+```
+
+Same env var, two languages, two defaults. The day the worker's default changed
+(opus → sonnet), the launcher's did not — and from that deploy on, the log said
+`model=opus` on every run while the pack actually ran sonnet. Nothing breaks
+functionally, which is what makes it worse: the log is exactly where you go to
+ask "which model ran this?" when auditing spend or debugging a strange result.
+
+Minimal proof (same env, two paths, two answers):
+
+```bash
+bash -c 'echo "${VAR:-opus}"'                      # -> opus
+node -e 'console.log(process.env.VAR || "sonnet")' # -> sonnet
+```
+
+**The fix is not syncing the literals.** Changing `:-opus` to `:-sonnet` leaves
+the factory intact — they will drift apart again. The fix is that **the launcher
+only asserts what it controls**:
+
+```bash
+log "LAUNCH gardener ... ${GARDENER_MODEL:+model-override=$GARDENER_MODEL}"
+```
+
+- If there's an env override, log it AS an override (that part the launcher does
+  own).
+- If not, log nothing — the authoritative line is whatever the worker itself
+  prints at startup (e.g. `[gardener] init ... model=claude-...` on stderr,
+  which the launcher already redirects into the same log). That comes from the
+  process that actually ran.
+
+**General rule, plus the widening it took a second finding to reach:** in any
+launcher/worker pair (bash→node, systemd→binary, wrapper→CLI), a value with a
+default has exactly ONE owner — the process that consumes it. Every other place
+that wants to mention it either reads the effective value, logs only the
+override, or stays silent. A second literal is debt with a detonation date.
+
+The widening (same deploy, an hour later): the first patch searched for the
+measured PATTERN of the bug (`:-opus` in a log line), not the CLASS (any
+surface that names the value). Running an unfiltered `grep -rn 'opus'` over the
+whole repo turned up six more assertions of the old default: the README (in the
+billing sentence — the worst possible place), the tuning table (the canonical
+surface for "what actually runs"), and three header comments — one twenty lines
+from the `const` that contradicted it. The complete rule: the default has ONE
+owner, and everything else — log, README, table, comment — either points at the
+owner or mirrors it with the owner as tiebreaker. When patching: sweep the
+CLASS (`grep -rn` for the old value across the whole repo), not the instance.
+Historical mentions ("opus's premium used to be 37%") stay — they describe the
+past, not a current default.
+
 ## Tune model and effort per lobo, by env var
 
 Not every lobo needs the same horsepower. Drive `model` and `effort` per lobo from an env var so the launcher sets them per role:

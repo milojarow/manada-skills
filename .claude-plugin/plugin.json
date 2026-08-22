@@ -1,6 +1,6 @@
 {
   "name": "manada-skills",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Use when creating, scoping, customizing, deploying, or invoking Claude Code subagents — across every scope (plugin/project/user-global) and via the Claude Agent SDK. Covers choosing a scope, per-agent customization (model/tools/skills/memory/effort/color), harness vs SDK, subscription auth, and when fan-out pays off.",
   "author": {
     "name": "milojarow",
