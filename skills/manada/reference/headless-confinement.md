@@ -90,6 +90,39 @@ reaching the model, the canary file **absent**, and a normal exit.
 Also worth sabotaging the guard (make it allow everything) to confirm the tests then fail. A test
 that doesn't fail when you break what it tests isn't testing anything.
 
+## The outgoing gate belongs to the launcher, never to the model
+
+When a lobo's job ends in an irreversible outward action — pushing to a public repo, posting,
+sending — the check in front of that action must live in the process that performs it.
+**Whoever pushes is whoever gates, and the gater is not the model.** A lobo holding
+`Bash(git:*)` also holds `push --no-verify`, so a pre-push hook is not a gate against prompt
+injection: take the push away from the model and give it to the launcher, which greps the
+outgoing diff against a deny-list *before* pushing.
+
+Five requirements — R1–R3 measured against real machines, R4–R5 structural:
+
+- **R1 — pin the instrument's binary.** In Claude Code's Bash tool, `grep` is a **function**
+  from the shell snapshot that executes ugrep (`ARGV0=ugrep`). That is the norm, not a local
+  quirk, and ugrep dies on a BRE `\|` coming from a deny-list: `error: empty (sub)expression`.
+  A gate written with a bare `grep -f` dies on its first run. Use `/usr/bin/grep`, or validate
+  the patterns against the chosen binary when installing the gate.
+- **R2 — match the flag to the deny-list's dialect.** A deny-list written in ERE (`{n}`, `+`,
+  `?`, `|`, `()`) and read by a plain `grep -f` is searched as **literal text**. Measured with
+  six planted fake secrets (a token prefix, a JWT, a connection URI, a cloud key id, an IP, a
+  phone number): `grep -f` found 0 of 6, `grep -Ef` found all 6. Pass `-E`, or declare the
+  dialect in the deny-list header and marry it to the flag.
+- **R3 — positive control on EVERY run, over a regex-only pattern.** Feed the instrument a
+  string that must match and require a non-zero count; a run that cannot prove its instrument
+  works cannot report a zero. The control string must exercise a pattern that **only a live
+  regex** can catch (a fake token-shaped literal). A control that happens to hit a literal
+  pattern of the deny-list does not discriminate — it passes identically with every regex in
+  the file dead, which is how a first audit reported "0 matches" with a broken instrument.
+- **R4 — fail closed.** Any instrument failure — exit status > 1, invalid pattern, deny-list
+  file absent — means **no push, plus a log entry**; never "nothing matched, go ahead". A
+  corrupt deny-list must not be able to turn into a green light.
+- **R5 — the gate runs outside the model's reach**: in the launcher, after the model's work is
+  committed and before anything leaves the machine.
+
 ## Fail closed
 
 If the guard module is missing, the `import` throws and the lobo **does not run** — failing closed,

@@ -117,6 +117,25 @@ CLASS (`grep -rn` for the old value across the whole repo), not the instance.
 Historical mentions ("opus's premium used to be 37%") stay — they describe the
 past, not a current default.
 
+## A surface can lie about a BEHAVIOUR, not just a value
+
+The same failure class as the section above, one level up — and the expensive one.
+
+A launcher's header comment stated that it "scrub-gates the outgoing diff". No code applied
+the deny-list: the gate existed only as an instruction in the **prompt** of the model it
+launched. On the strength of that sentence, the lobo that pushes to public repos with a live
+`GH_TOKEN` was moved down to a cheaper tier. It was caught only because the peer agent on the
+other machine asked one question — *"is your gate code, or is it the same comment I just
+measured in my own clone?"*. The tier was reverted, but the lobo had already run three times
+at the lower tier and pushed to three public repos. The mechanical audit afterwards returned
+0 matches — that time.
+
+**A surface can misstate a VALUE (a default) or a BEHAVIOUR (a gate, a retry, a backup).** A
+wrong value corrupts a log; a wrong behaviour corrupts a risk decision, because "there is a
+gate" is exactly the premise on which someone lowers a safeguard. The only source for either
+is the code that executes it: open the path that runs and find the enforcement, or treat the
+behaviour as absent. Citing a comment as evidence is memory, not measurement.
+
 ## Tune model and effort per lobo, by env var
 
 Not every lobo needs the same horsepower. Drive `model` and `effort` per lobo from an env var so the launcher sets them per role:
