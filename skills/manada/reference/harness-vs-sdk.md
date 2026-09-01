@@ -62,3 +62,19 @@ The SDK persists each conversation to disk and can resume it — context = the r
 | `persistSession: false` | stateless; nothing written to disk |
 
 Transcripts live at `~/.claude/projects/<encoded-cwd>/<session-id>.jsonl`; a `resume` that returns a blank session is usually a **cwd mismatch**. Resuming re-materializes the full transcript, so token cost grows with history (prompt caching amortizes it).
+
+## Two more shapes the harness offers
+
+**Agent teams (experimental).** With `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` a session becomes a
+team lead whose **teammates** are full sessions that share a task list (`TaskCreate` / `TaskList` /
+`TaskUpdate`) and message each other directly (`ListAgents` + `SendMessage`); a subagent definition
+can be reused as a teammate type. Not GA: one team per session, no resume, no nested teams, and
+the display modes (`in-process`, `tmux`, `iterm2`) are still moving. It is the harness-native
+answer to "two sessions coordinating on one repo"; a subagent is a worker you *own*, a teammate is
+a peer you *coordinate with*.
+
+**Skills with `context: fork`.** The inverse of preloading a skill into an agent: the *skill's body*
+is the task, run inside an agent type (`context: fork`, `agent: Explore`, `background: false` to
+wait for it). The skill sees no conversation history — only its own text and the agent's system
+prompt (Explore and Plan also skip `CLAUDE.md`). Right for a skill that IS a task ("research X and
+report"); useless for a skill that is guidelines, which returns nothing actionable.

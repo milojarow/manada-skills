@@ -1,0 +1,18 @@
+{
+  "id": "manada-007",
+  "skills": ["manada"],
+  "query": "¿Un subagente puede lanzar sus propios subagentes? Quiero que mi lanzador headless no pueda hacerlo bajo ninguna circunstancia.",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/dispatching.md (and headless-launcher.md for the fork-bomb context)",
+    "States that nesting is allowed by default: three layers below the main session, controlled by CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH; forks keep the Agent tool at the limit",
+    "Prescribes the policy: keep Agent out of the lobo's tools list AND set the depth to 1 for the headless launcher, plus the SDK availability filter (tools: [...] without Agent/Workflow)"
+  ],
+  "expected_content": [
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH",
+    "Agent",
+    "dispatching.md"
+  ],
+  "priority": "high",
+  "notes": "Corrects the old claim that the pack is flat by nature; a flat pack is enforced, not assumed."
+}

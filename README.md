@@ -12,13 +12,15 @@
 - **Plugin-shipped agents are capped for security.** `hooks`, `mcpServers` and `permissionMode` are ignored when an agent ships in a plugin. The capability is real — you get it back in project/user scope or via the SDK. Knowing this up front saves a confusing debug.
 - **Most agents should be ephemeral; some should remember.** Persistent `memory` turns a one-shot worker into one that learns across sessions — powerful, and opt-in.
 - **Fan-out pays only when work divides.** Parallel agents shine for independent work (isolation + concurrency); for sequential work they're pure overhead.
-- **Subagents start blind.** Fresh context, no view of the parent conversation — whatever the worker needs goes in the dispatch prompt.
+- **Subagents start blind.** Fresh context, no view of the parent conversation — whatever the worker needs goes in the dispatch prompt (or dispatch a `fork`, which inherits everything).
+- **A lobo is not free before it works.** Measured: a `general-purpose` lobo starts at ~114k tokens of context, an `Explore` lobo at ~38k — the difference is the inherited `CLAUDE.md` hierarchy. Declare `tools`, preload at most one skill, send read-only jobs to `Explore`/`Plan`.
+- **The graph is a tool.** Multi-stage orchestration (review each file, verify each finding) is what the Workflow tool (ultracode) runs deterministically — on the user's explicit opt-in.
 
 ## The skill
 
 | Skill | Description |
 |-------|-------------|
-| **manada** | Create, scope, customize, deploy and dispatch Claude Code subagents (harness + Agent SDK). |
+| **manada** | Create, scope, customize, deploy and dispatch Claude Code subagents (harness + Agent SDK), bound what they cost to start, and pick fan-out vs pipeline vs Workflow. |
 
 ## Installation
 

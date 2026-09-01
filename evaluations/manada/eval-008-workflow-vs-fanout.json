@@ -1,0 +1,20 @@
+{
+  "id": "manada-008",
+  "skills": ["manada"],
+  "query": "Tengo 12 hallazgos de una revisión. Quiero que un agente adversarial verifique cada uno y luego consolidar solo los confirmados. ¿Lo hago con llamadas Agent en paralelo o con un workflow?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/workflows.md",
+    "Explains that a per-item verification stage feeding a consolidation is the Workflow shape (pipeline/parallel with typed schema results), but that the Workflow tool runs only on the user's explicit opt-in (ultracode / 'use a workflow')",
+    "Without that opt-in: 12 Agent calls in one message (fan-out), collect and filter in the main session",
+    "Notes the caps (16 concurrent, ~15 agents guideline) and that every lobo still pays its startup"
+  ],
+  "expected_content": [
+    "ultracode",
+    "pipeline",
+    "parallel",
+    "workflows.md"
+  ],
+  "priority": "medium",
+  "notes": "Guards both directions: not reaching for the Workflow tool without opt-in, and knowing it exists when the graph has stages."
+}

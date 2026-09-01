@@ -1,0 +1,20 @@
+{
+  "id": "manada-006",
+  "skills": ["manada"],
+  "query": "Voy a lanzar seis lobos general-purpose en paralelo, cada uno con cuatro skills precargadas, para que revisen archivos del repo y me digan qué encuentran. ¿Algo que ajustar antes?",
+  "expected_behavior": [
+    "Activates the manada skill",
+    "Routes to reference/context-budget.md",
+    "Warns that each general-purpose lobo starts at roughly 114k tokens of context (inherited CLAUDE.md hierarchy + skill listing) and that preloading four skills adds each skill's full body per lobo",
+    "Prescribes: read-only review goes to Explore/Plan (they skip CLAUDE.md, ~38k), declare tools without Skill when the lobo will not invoke skills, preload at most one skill",
+    "Mentions the measurement command (jq on the transcript's first assistant usage) or claude plugin details as the instrument"
+  ],
+  "expected_content": [
+    "Explore",
+    "tools",
+    "skills",
+    "context-budget.md"
+  ],
+  "priority": "high",
+  "notes": "Guards the operator's standing rule: lobos are never launched loaded with skills; startup cost is measured, not guessed."
+}
