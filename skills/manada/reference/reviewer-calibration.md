@@ -52,3 +52,38 @@ failure mode, not noise:
 Same principle as the outgoing-diff gate in
 [headless-confinement.md](headless-confinement.md#the-outgoing-gate-belongs-to-the-launcher-never-to-the-model):
 a zero result is only meaningful once the instrument producing it is proven live.
+
+## A live reviewer can look dead: check the process, not the launcher's name for it
+
+A watchdog script that decides "the reviewer died, relaunch it" on weak signals can declare a
+perfectly healthy run dead — and the fix (relaunching) burns the budget on a duplicate run
+racing the original. Two false-negatives cause this, and they stack.
+
+**Process check: match `comm`, not the `exe` basename.** Some CLIs install a thin launcher at
+`/usr/bin/<name>` that execs a separately-versioned binary under `~/.<name>/downloads/...`, so
+`/proc/<pid>/exe` resolves to a path whose basename doesn't match `<name>` at all — a watchdog
+that filters `case "$exe" in */<name>) ...` misses a process that has been running for minutes.
+`/proc/<pid>/comm` (the kernel's name for the main thread, 15 chars) still reports the tool's
+short name correctly regardless of which binary is actually loaded. `pgrep -x <name>` matches on
+`comm` and, unlike `-f`, never self-matches the watchdog's own command line. Use `/proc/<pid>/cwd`
+only to tell apart *which* of several live instances you're looking at; if you must match on
+`exe`, match by basename **prefix**, never equality.
+
+**Output check: file size is not a certificate of death.** A process mid-run can leave its
+output file at a few hundred bytes for a long time when the bulk of the answer only lands at the
+end — a short file plus "process not found" reads as "abandoned," when the process was simply one
+correct pgrep filter away from being found. The only signal that actually distinguishes "still
+writing" from "gave up" is who holds the file descriptor:
+
+    readlink /proc/<pid>/fd/1     # is <pid> still writing to this fd?
+    fuser <file> 2>/dev/null      # or, from the file's side: who has it open?
+
+**Renaming the file does not redirect the writer.** The fd follows the inode, not the path. If a
+still-running process's output gets renamed "because it looked abandoned," the writer keeps
+appending to the renamed file under its old fd, and anything later created at the old path starts
+empty and stays empty. Recoverable by renaming back — same inode, the writer never noticed.
+
+Cost of getting both checks wrong together, measured once: a reviewer already several minutes
+into a real run, declared dead by basename-matching plus a short-output heuristic, and relaunched
+twice — three identical review runs stacked on the same diff, burning three times the budget for
+one answer.
