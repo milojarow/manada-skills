@@ -1,6 +1,6 @@
 {
   "name": "manada-skills",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Use when creating, scoping, customizing, deploying, or dispatching Claude Code subagents — plugin/project/user-global agents and Agent SDK agents — when choosing harness vs SDK, fan-out vs pipeline vs Workflow, or when a lobo's startup cost or confinement must be bounded.",
   "author": {
     "name": "milojarow",
