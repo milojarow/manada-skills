@@ -20,6 +20,32 @@ The Agent SDK is `@anthropic-ai/claude-agent-sdk` (Anthropic's own). It can run 
 - **Precedence gotcha:** if `ANTHROPIC_API_KEY` is set in the env, it **wins** and bills API credits instead of the subscription. Unset it to stay on the sub. Confirm you landed on the sub by checking `apiKeySource === "none"` on the `init` event — anything else means a key leaked into the env and you're paying API.
 - **Billing:** before ~15 Jun 2026, SDK/subscription usage drew from the same pool as interactive Claude Code; from 15 Jun 2026 it moves to a **separate monthly credit** (Pro $20 / Max-5x $100 / Max-20x $200). Verify current terms.
 
+### `claude --bare` is API-key-only — not a subscription isolation option
+
+For a headless dispatch via the **CLI** (`claude -p`, not the SDK's `query()`), `--bare` looks
+like the obvious "start fast, skip everything" flag — it isn't usable on a subscription.
+Measured: `claude --bare -p "…"` with valid OAuth credentials on disk still exits 1,
+`Not logged in · Please run /login`. By design `--bare` reads only `ANTHROPIC_API_KEY` or an
+`apiKeyHelper`; OAuth and the keychain are never consulted, no matter what's logged in.
+
+What actually gets the same ablation on a subscription:
+
+- **Everything off, OAuth still works:** `claude --safe-mode --disable-slash-commands` — no
+  CLAUDE.md, no persona/memory, no hooks, no plugins, no MCP, 0 skills. `--safe-mode` alone
+  still lists the 13 built-in skills (dataviz, code-review, update-config, …);
+  `--disable-slash-commands` is what removes them and the Skill tool itself.
+- **Skills off, CLAUDE.md + MCP kept:** `claude --disable-slash-commands --settings
+  '{"disableAllHooks":true}'`. Hooks must be disabled too — a plugin's `SessionStart` hook can
+  still inject "you MUST invoke a skill" text into a session that now has zero skills to invoke.
+- **SDK:** `settingSources: []` (see above) — the SDK never had this problem, only the CLI does.
+
+Launching a probe from inside another Claude Code session needs its own env scrub, or the
+child inherits session state meant for the parent:
+`env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT claude … -p "…" < /dev/null` — the `< /dev/null`
+matters, without it the probe waits ~3s on stdin. Count leftover probe processes by resolving
+`readlink /proc/<pid>/exe` against the installed `claude` versions dir, never by matching
+command text (multiple CLI generations can share argv shapes).
+
 ## Node launch gotcha
 
 On bleeding-edge Node (e.g. Node 26 on a rolling-release distro), the SDK's bundled native binary may fail to launch (`native binary exists but failed to launch`). Fix: point the SDK at the **system `claude`** binary —
