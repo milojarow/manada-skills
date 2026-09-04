@@ -28,6 +28,36 @@ The trap: spawning workers because you *can*. A subagent for sequential work the
 - **SDK:** `query({ prompt, options: { agents: {…}, allowedTools: ["Agent", …] } })` lets the main agent delegate by description; or run independent `query()` calls under `Promise.all` for raw fan-out.
 - Every dispatch's prompt is the **only channel** to a non-fork worker — see [personalization.md](personalization.md).
 
+## Verify a worktree before dispatching — "the directory exists" isn't "it's the right tree"
+
+`git worktree add -b <branch> <dir> <base>` **fails if `<dir>` already exists** — typically a
+leftover from an earlier dispatch in the same session — and the intuitive check lies about it:
+
+```bash
+test -d "$dir/src" && echo "OK"    # true even for a worktree left over from a stale earlier task
+```
+
+A worker dispatched into a stale worktree starts on a dead branch: its diff either resurrects old
+code or conflicts with everything on merge. Worse, `add -b` **creates the branch before it fails**
+on the existing directory, so a retry fails a *different* way ("a branch named X already exists")
+and reads like an unrelated error to whoever's watching.
+
+The check that actually discriminates — expected branch **and** HEAD equal to the base's — run
+from inside the worktree, before dispatching anything into it:
+
+```bash
+cd "$dir" \
+  && [ "$(git branch --show-current)" = "$branch" ] \
+  && [ "$(git rev-parse HEAD)" = "$(git rev-parse "$base")" ] \
+  && echo FRESH || { echo "DO NOT DISPATCH"; exit 1; }
+```
+
+**The cleanup that prevents the whole class:** once a worker's diff is merged, remove BOTH the
+worktree (`git worktree remove --force`) and the branch (`git branch -D`). Leaving only one turns
+the next `add` with that name into the failure above. Printing `git worktree list` in the same
+turn as a dispatch is worth doing on its own — a long list of stale worktrees is itself the sign
+that cleanup isn't happening.
+
 ## Foreground vs background
 
 In an interactive session lobos run in the **background** by default: you keep working, the result arrives as a task notification, and permission prompts surface in the main session naming the lobo. A background lobo gets a **narrower built-in tool set** (Read, Grep, Glob, Bash, Edit, Write, NotebookEdit, WebFetch, WebSearch, TodoWrite, Skill, ToolSearch, Monitor, TaskStop, SendMessage, Artifact, worktree enter/exit) — no `Agent` tool among them. `background: true` in the definition pins a lobo to the background; `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` forces everything to the foreground. Before v2.1.186 background lobos auto-denied permission prompts.
